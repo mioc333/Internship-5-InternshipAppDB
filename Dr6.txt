@@ -1,0 +1,189 @@
+CREATE TABLE Members (
+	MemberId SERIAL PRIMARY KEY,
+	Name VARCHAR(30) NOT NULL,
+	Pin VARCHAR(11) CHECK(LENGTH(Pin) = 11),
+	Birth TIMESTAMP,
+	PlaceOfResidence VARCHAR(30),
+	Gender VARCHAR(1) CHECK(Gender IN ('M', 'F')),
+	Age INT
+)
+
+CREATE TABLE Interns (
+	InternId SERIAL PRIMARY KEY,
+	Name VARCHAR(30) NOT NULL,
+	Pin VARCHAR(11),
+	Birth TIMESTAMP,
+	PlaceOfResidence VARCHAR(30),
+	Gender VARCHAR(1) CHECK(Gender IN ('M', 'F')),
+	Age INT CHECK(Age>=16 AND Age<=24)
+)
+
+CREATE TABLE Internships(
+	InternshipId SERIAL PRIMARY KEY,
+	Name VARCHAR(30) NOT NULL,
+	StartDate TIMESTAMP,
+	EndDate TIMESTAMP,
+	Phase VARCHAR CHECK(Phase IN ('In preparation', 'In progress', 'Completed')),
+	Director INT REFERENCES Members(MemberId)
+)
+
+CREATE TABLE Areas(
+	AreasId SERIAL PRIMARY KEY,
+	Name VARCHAR(30) NOT NULL
+)
+
+CREATE TABLE MembersAreasInternships(
+	MemberId INT REFERENCES Members(MemberId),
+	AreasId INT REFERENCES Areas(AreasId),
+	InternshipId INT REFERENCES Internships(InternshipId),
+	PRIMARY KEY(MemberId, AreasId, InternshipId)
+)
+
+CREATE TABLE InternsAreasInternships(
+	InternId INT REFERENCES Interns(InternId),
+	AreasId INT REFERENCES Areas(AreasId),
+	InternshipId INT REFERENCES Internships(InternshipId),
+	PRIMARY KEY(InternId, AreasId, InternshipId),
+	Status VARCHAR CHECK(Status IN ('Intern','Kicked','Intenship completed'))	
+)
+
+CREATE TABLE Homework(
+	HomeworkId SERIAL PRIMARY KEY,
+	Name VARCHAR(30) NOT NULL,
+	AreasId INT REFERENCES Areas(AreasId),
+	InternshipId INT REFERENCES Internships(InternshipId)
+)
+
+CREATE TABLE InternHomework(
+	InternId INT REFERENCES Interns(InternId),
+	HomeworkId INT REFERENCES Homework(HomeworkId),
+	PRIMARY KEY(InternId, HomeworkId),
+	Grade VARCHAR(1) CHECK(Grade IN ('1','2','3','4','5')),
+	Rectifier INT REFERENCES Members(MemberId)
+)
+
+INSERT INTO Members(MemberId, Name, Pin, Birth, PlaceOfResidence, Gender, Age) VALUES
+(DEFAULT, 'Mate Ivic', '12345678901', '1998-11-5', 'Split', 'M', 24),
+(DEFAULT, 'Ivana Grgic', '12345678951', '2000-12-5', 'Zagreb', 'F', 23),
+(DEFAULT, 'Toni Ivanovic', '21445678901', '1995-11-5', 'Zadar', 'M', 27),
+(DEFAULT, 'Amelija Ivic', '12345678955', '1994-12-5', 'Osijek', 'F', 27),
+(DEFAULT, 'Ivo Grgic', '12345778901', '1993-11-5', 'Split', 'M', 29),
+(DEFAULT, 'Ana Jelic', '12245678951', '2000-12-5', 'Zagreb', 'F', 22),
+(DEFAULT, 'Ante Radic', '21445678999', '1997-11-5', 'Zadar', 'M', 25),
+(DEFAULT, 'Jelena Ivic', '02345678955', '1998-12-5', 'Osijek', 'F', 24)
+
+INSERT INTO Areas(AreasId, Name) VALUES
+(DEFAULT, 'Programiranje'),
+(DEFAULT, 'Marketing'),
+(DEFAULT, 'Multimedija'),
+(DEFAULT, 'Dizajn')
+
+INSERT INTO Internships(InternshipId, Name, StartDate, EndDate, Phase, Director) VALUES
+(DEFAULT, 'Internship_20/21', '2020-11-01', '2021-05-01', 'Completed',2),
+(DEFAULT, 'Internship_21/22', '2021-11-01', '2022-05-01', 'In progress',1),
+(DEFAULT, 'Internship_22/23', '2022-11-01', '2023-05-01', 'In preparation',8)
+
+INSERT INTO MembersAreasInternships(MemberId, AreasId, InternshipId) VALUES
+(1, 1, 1),
+(2, 1, 1),
+(3, 2, 1),
+(4, 2, 1),
+(5, 3, 1),
+(6, 3, 1),
+(7, 4, 1),
+(8, 4, 1),
+(1, 1, 2),
+(2, 1, 2),
+(3, 2, 2),
+(4, 2, 2),
+(5, 3, 2),
+(6, 3, 2),
+(7, 4, 2),
+(8, 4, 2),
+(1, 1, 3),
+(2, 1, 3),
+(3, 2, 3),
+(4, 2, 3),
+(5, 3, 3),
+(6, 3, 3),
+(7, 4, 3),
+(8, 4, 3)
+
+INSERT INTO Homework(HomeworkId, Name, AreasId, InternshipId) VALUES
+(DEFAULT, 'Homework1', 1, 2),
+(DEFAULT, 'Homework2', 1, 2),
+(DEFAULT, 'Homework3', 1, 2),
+(DEFAULT, 'Homework1', 2, 2),
+(DEFAULT, 'Homework2', 2, 2),
+(DEFAULT, 'Homework3', 2, 2),
+(DEFAULT, 'Homework1', 3, 2),
+(DEFAULT, 'Homework2', 3, 2),
+(DEFAULT, 'Homework1', 4, 2)
+
+INSERT INTO Interns(InternId, Name, Pin, Birth, PlaceOfResidence, Gender, Age) VALUES
+(DEFAULT, 'Ante Antic', '99345678901', '1998-11-5', 'Split', 'M', 24),
+(DEFAULT, 'Lea Vulic', '92345678951', '2000-12-5', 'Zagreb', 'F', 23),
+(DEFAULT, 'Miro Bulic', '91445678901', '2000-11-5', 'Zadar', 'M', 22),
+(DEFAULT, 'Anamarija Ivic', '92345678955', '1999-12-5', 'Osijek', 'F', 23),
+(DEFAULT, 'Mirko Grgic', '92345778901', '2001-11-5', 'Split', 'M', 21),
+(DEFAULT, 'Ana Jelic', '92245678951', '2000-12-5', 'Zagreb', 'F', 22),
+(DEFAULT, 'Rino Radic', '91445678999', '2002-11-5', 'Zadar', 'M', 20),
+(DEFAULT, 'Lucia Ivic', '92345678955', '2006-12-5', 'Osijek', 'F', 16),
+(DEFAULT, 'Marin Radic', '9144598999', '2002-11-5', 'Zadar', 'M', 20),
+(DEFAULT, 'Maria Ivic', '91145678955', '2006-12-5', 'Osijek', 'F', 16)
+
+SELECT InternId FROM Interns
+
+INSERT INTO InternsAreasInternships(InternId, AreasId, InternshipId, Status) VALUES
+	(1,1,2,'Intern'),
+	(2,1,2,'Intern'),
+	(3,2,2,'Intern'),
+	(4,2,2,'Intern'),
+	(5,2,2,'Kicked'),
+	(6,2,2,'Kicked'),
+	(7,3,2,'Intern'),
+	(8,3,2,'Intern'),
+	(9,4,2,'Intern'),
+	(10,4,2,'Intern')
+	
+SELECT InternId FROM Interns 
+
+INSERT INTO InternHomework(InternId, HomeworkId, Grade, Rectifier) VALUES
+	(1,1,5,1),
+	(1,2,5,1),
+	(1,3,4,2),
+	(2,1,2,2),
+	(2,2,3,2),
+	(2,3,1,2),
+	(3,4,2,3),
+	(3,5,2,4),
+	(3,6,1,3),
+	(4,4,5,4),
+	(4,5,5,3),
+	(4,6,5,4),
+	(7,7,2,5),
+	(7,8,1,6),
+	(8,7,4,5),
+	(8,8,4,6),
+	(9,9,2,7),
+	(10,9,3,8)
+	
+SELECT Name FROM Members 
+	WHERE PlaceOfResidence != 'Split'
+	
+SELECT Name AS Ime, StartDate AS Pocetak, EndDate AS Zavrsetak FROM Internships 
+	ORDER BY StartDate DESC
+	
+SELECT i.Name FROM Interns i
+WHERE EXISTS
+(SELECT InternId FROM InternsAreasInternships WHERE InternshipId=2)
+
+SELECT COUNT(*) AS BrojPripravnica FROM Interns	 
+WHERE EXISTS
+(SELECT InternId FROM InternsAreasInternships WHERE InternshipId=2)
+AND	Gender='F'
+
+SELECT COUNT(i) AS BrojIzbacenihMarketinga FROM Interns i
+JOIN InternsAreasInternships s ON (i.InternId=s.InternId AND s.Status='Kicked')
+JOIN Areas ar ON (ar.AreasId = s.AreasId AND ar.Name='Marketing')
+
